@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
