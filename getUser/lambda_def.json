@@ -1,7 +1,7 @@
 {
-    "function_name": "getLikeNames",
+    "function_name": "getUser",
     "http_methode": "GET",
-    "route": "getLikeNames",
+    "route": "getUser/{user_id}",
     "meta": { 
         "package_type": "zip",
         "tags": {

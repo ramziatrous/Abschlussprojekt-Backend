@@ -14,8 +14,7 @@ const sequelize = new Sequelize({
 
 const Post = sequelize.define('Post', {
   PostID: {
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV4,
+    type: Sequelize.STRING,
     primaryKey: true,
   },
   UserID: {
@@ -38,6 +37,7 @@ exports.handler = async (event, context) => {
    
 
       const newPost = await Post.create({
+        PostID : uuidv4(),
         UserID: data.user_id,
         Content: data.content,
         MediaLink: data.media_link,

@@ -16,7 +16,7 @@ const Like = sequelize.define('Like', {
         primaryKey: true,
     },
     PostID: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         allowNull: false,
     },
     UserID: {

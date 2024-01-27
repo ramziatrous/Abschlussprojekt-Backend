@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DATE } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 
 console.log("################# DATABASE PART #################");
@@ -33,6 +33,7 @@ exports.handler = async (event, context) => {
     const antwortFrontend = {
         status: "ok",
         message: "",
+        user:"",
         steps: {}
     };
     try {
@@ -89,14 +90,16 @@ exports.handler = async (event, context) => {
             antwortFrontend.isNewUser = true;
             try {
                 const [insertUser, _] = await sequelize.query(`
-                    INSERT INTO User (UserID, GoogleID, RealName, EmailAddress, BirthDate, Course, AuthProvider, ProfileImg)
-                    VALUES ('${uuidv4()}', '${googleUserData.sub}', '${googleUserData.name}', '${googleUserData.email}', null, null, "google", '${googleUserData.picture}')
+                    INSERT INTO User (UserID, GoogleID, RealName, EmailAddress, BirthDate, Course, CreatedAt, AuthProvider, ProfileImg)
+                    VALUES ('${uuidv4()}', '${googleUserData.sub}', '${googleUserData.name}', '${googleUserData.email}', null, null,'${new Date().toISOString()}', "google", '${googleUserData.picture}')
                 `);
                 antwortFrontend.steps.insertUser = "ok";
                 antwortFrontend.steps.insertUserMessage = JSON.stringify(insertUser);
                 let sessionID = await createSession(googleUserData, googleToken);
                 antwortFrontend.steps.session = "ok";
                 antwortFrontend.sessionData = sessionID;
+                const existingUser = await sequelize.query(` SELECT * FROM User WHERE GoogleID = '${googleUserData.sub}' `);
+            antwortFrontend.user = JSON.stringify(existingUser);
             } catch (error) {
                 antwortFrontend.status = "error";
                 antwortFrontend.steps.insertUser = JSON.stringify(error);

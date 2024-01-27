@@ -27,24 +27,28 @@ const Post = sequelize.define('Post', {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  CreatedAt: {
+    type: Sequelize.DATE,  // Assuming you have a field named CreatedAt
+    allowNull: false,
+    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+  },
 });
 
 exports.handler = async (event, context) => {
-
   const antwortFrontend = {
-      status: "ok",
-    
+    status: "ok",
   };
   try {
-    
-    const posts = await Post.findAll();
+    // Update the findAll query to order by CreatedAt in descending order
+    const posts = await Post.findAll({
+      order: [['CreatedAt', 'DESC']],
+    });
 
-    
     const formattedPosts = posts.map(post => ({
       id: post.PostID,
       user_id: post.UserID,
       content: post.content,
-      MediaLink: post.media_link,
+      MediaLink: post.MediaLink,
     }));
 
     return {
@@ -53,7 +57,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status : "ok",
+        status: "ok",
         posts: formattedPosts,
       }),
     };
