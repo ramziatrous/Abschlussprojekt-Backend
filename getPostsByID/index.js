@@ -1,6 +1,6 @@
 
 const Sequelize = require('sequelize');
-
+const moment = require('moment');
 const sequelize = new Sequelize({
   dialect: process.env.TSNET_DB_DIALECT,
   host: process.env.TSNET_DB_HOST,
@@ -28,6 +28,11 @@ const Post = sequelize.define('Post', {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  CreatedAt: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+  },
 });
 
 exports.handler = async (event, context) => {
@@ -36,6 +41,7 @@ exports.handler = async (event, context) => {
     const user_id = event.pathParameters.user_id;
 
     const posts = await Post.findAll({
+      order: [['CreatedAt', 'DESC']],
       where: {
         UserID: user_id,
       },
@@ -46,7 +52,9 @@ exports.handler = async (event, context) => {
       id: post.PostID,
       user_id: post.UserID,
       content: post.content,
-      MediaLink: post.media_link,
+      MediaLink: post.mediaLink,
+      MediaLink: post.MediaLink,
+      CreatedAt: moment(post.CreatedAt).add(1, 'hours').format('YYYY-MM-DD HH:mm'),
     }));
 
     return {

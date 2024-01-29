@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const moment = require('moment');
 
 const sequelize = new Sequelize({
   dialect: process.env.TSNET_DB_DIALECT,
@@ -28,7 +29,7 @@ const Post = sequelize.define('Post', {
     allowNull: true,
   },
   CreatedAt: {
-    type: Sequelize.DATE,  // Assuming you have a field named CreatedAt
+    type: Sequelize.DATE,
     allowNull: false,
     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
   },
@@ -39,7 +40,7 @@ exports.handler = async (event, context) => {
     status: "ok",
   };
   try {
-    // Update the findAll query to order by CreatedAt in descending order
+    
     const posts = await Post.findAll({
       order: [['CreatedAt', 'DESC']],
     });
@@ -49,6 +50,7 @@ exports.handler = async (event, context) => {
       user_id: post.UserID,
       content: post.content,
       MediaLink: post.MediaLink,
+      CreatedAt: moment(post.CreatedAt).add(1, 'hours').format('YYYY-MM-DD HH:mm'),
     }));
 
     return {

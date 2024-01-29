@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 const Sequelize = require('sequelize');
 

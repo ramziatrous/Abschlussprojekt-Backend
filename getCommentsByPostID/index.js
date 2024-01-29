@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const moment = require("moment");
 
 const sequelize = new Sequelize({
   dialect: process.env.TSNET_DB_DIALECT,
@@ -27,6 +28,11 @@ const Comment = sequelize.define("Comment", {
     type: Sequelize.TEXT,
     allowNull: false,
   },
+  CreatedAt: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+  },
 });
 
 exports.handler = async (event, context) => {
@@ -34,12 +40,20 @@ exports.handler = async (event, context) => {
     await testDatabaseConnection();
     const postId = event.pathParameters.post_id;
 
-    // Retrieve comments by PostID from the database
-    const comments = await Comment.findAll({
+  
+    const comment = await Comment.findAll({
       where: {
         PostID: postId,
       },
     });
+
+    const comments = comment.map(comment => ({
+      CommentID: comment.CommentID,
+      UserID: comment.UserID,
+      PostID: comment.PostID,
+      Content: comment.Content,
+      CreatedAt: moment(comment.CreatedAt).add(1, 'hours').format('YYYY-MM-DD HH:mm'),
+    }));
 
     return {
       statusCode: 200,
